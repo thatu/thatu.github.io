@@ -34,6 +34,10 @@
             
 
             
+            <a href="/about/" class="header-nav-link">
+                关于
+            </a>
+            
         </nav>
     </div>
 </header>
@@ -76,6 +80,111 @@
     
         <article class="post-abstract">
             <div class="post-title">
+                <h2><a class="post-title-link" href="/2021/06/26/WebSocket/">WebSocket了解</a></h2>
+            </div>
+            <div class="post-meta">
+                <span class="post-time">2021-06-26</span>
+                
+                <span class="post-category">
+                    
+                    <a class="category" href="/categories/我的打工日记/">我的打工日记</a>
+                    
+                </span>
+                
+            </div>
+            <div class="post-content">
+                
+                    <p>最近工作中在开发一个系统消息实时播报的功能，由于当前产品不支持websocket, 刚好涉及到这方面的知识，索性就学习了解下😬；</p>
+<h4 id="实时数据获取方式"><a href="#实时数据获取方式" class="headerlink" title="实时数据获取方式"></a>实时数据获取方式</h4><ul>
+<li>【轮询获取】比较常见的是通过循环请求服务端获取数据，来保持数据同步，比较被动，只能由客户端发起，有一定的局限性和延迟，也会出现向服务器端发送请求时，服务器端的数据可能并没有更新，带来很多无谓请求，浪费带宽，效率低下也比较耗资源；</li>
+<li>【websocket方式】是http协议的一种补充，通过建立连接进行双向通信，减少通信量和资源消耗<h4 id="WebSocket简单示例"><a href="#WebSocket简单示例" class="headerlink" title="WebSocket简单示例"></a>WebSocket简单示例</h4></li>
+</ul>
+<ul>
+<li><p>服务端 node搭建websocket</p>
+<ol>
+<li><p>node 安装websocket</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install nodejs-websocket</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>新建js 文件 index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">var ws = require(&quot;nodejs-websocket&quot;);</span><br><span class="line">console.log(&quot;开始建立连接...&quot;);</span><br><span class="line"></span><br><span class="line">var game1 = null, game2 = null, game1Ready = false, game2Ready = false;</span><br><span class="line">// createServer</span><br><span class="line">var server = ws.createServer(function(event)&#123;</span><br><span class="line">    event.on(&quot;text&quot;, function (str) &#123;</span><br><span class="line">        console.log(&quot;收到的信息为:&quot; + str);</span><br><span class="line">        if(str === &quot;game1&quot;)&#123;</span><br><span class="line">            game1 = event;</span><br><span class="line">            game1Ready = true;</span><br><span class="line">            event.sendText(&quot;success&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        if(str === &quot;game2&quot;)&#123;</span><br><span class="line">            game2 = event;</span><br><span class="line">            game2Ready = true;</span><br><span class="line">        &#125;</span><br><span class="line">        if(game1Ready &amp;&amp; game2Ready)&#123;</span><br><span class="line">            game2.sendText(str);</span><br><span class="line">        &#125;</span><br><span class="line">        event.sendText(str);</span><br><span class="line">        if(game2Ready)&#123;</span><br><span class="line">            setInterval(() =&gt; &#123;</span><br><span class="line">                game2.sendText(new Date().toLocaleDateString()+&apos;--&apos;+new Date().getTime())</span><br><span class="line">            &#125;, 3000);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    event.on(&quot;close&quot;, function (code, reason) &#123;</span><br><span class="line">        console.log(&quot;关闭连接&quot;);</span><br><span class="line">    &#125;);</span><br><span class="line">    event.on(&quot;error&quot;, function (code, reason) &#123;</span><br><span class="line">        console.log(&quot;异常关闭&quot;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;).listen(8001)</span><br><span class="line">console.log(&quot;WebSocket建立完毕&quot;);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>运行 index.js</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node index.js</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>客户端</p>
+<ol>
+<li>新建html页面<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;</span><br><span class="line">    &lt;title&gt;websocket-demo&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;div id=&quot;mess&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var mess = document.getElementById(&quot;mess&quot;);</span><br><span class="line">    if (window.WebSocket) &#123;</span><br><span class="line">      var ws = new WebSocket(&apos;ws://127.0.0.1:8001&apos;);</span><br><span class="line">      ws.onopen = function(e)&#123;</span><br><span class="line">        console.log(&quot;连接服务器成功&quot;);</span><br><span class="line">        ws.send(&quot;game2&quot;);</span><br><span class="line">      &#125;;</span><br><span class="line">      ws.onclose = function(e)&#123;</span><br><span class="line">        console.log(&quot;服务器关闭&quot;);</span><br><span class="line">      &#125;;</span><br><span class="line">      ws.onerror = function()&#123;</span><br><span class="line">        console.log(&quot;连接出错&quot;);</span><br><span class="line">      &#125;;</span><br><span class="line">      ws.onmessage = function(e)&#123;</span><br><span class="line">        var time = new Date();</span><br><span class="line">        mess.innerHTML+=time+&quot;的消息：&quot;+e.data+&quot;&lt;br&gt;&quot;</span><br><span class="line">      &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+</li>
+</ul>
+<p>对websocket的初步了解暂时写到这里，后面会对具体项目改版使用过程持续更新…</p>
+
+                
+            </div>
+        </article>
+    
+        <article class="post-abstract">
+            <div class="post-title">
+                <h2><a class="post-title-link" href="/2021/06/23/hexo-常用命令/">hexo 常用命令</a></h2>
+            </div>
+            <div class="post-meta">
+                <span class="post-time">2021-06-23</span>
+                
+                <span class="post-category">
+                    
+                    <a class="category" href="/categories/我的打工日记/">我的打工日记</a>
+                    
+                </span>
+                
+            </div>
+            <div class="post-content">
+                
+                    <p>博客一直断更状态 以至于时间长不用 命令都忘了 特此整理下平时要更新博客的一些命令<br>或参考官方文档 <a href="https://hexo.io/zh-cn/docs/commands" target="_blank" rel="noopener">官方文档地址https://hexo.io/zh-cn/docs/commands</a><br>修改配置文件以后要重启</p>
+<h4 id="启动本地服务预览"><a href="#启动本地服务预览" class="headerlink" title="启动本地服务预览"></a>启动本地服务预览</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo s // hexo server的缩写</span><br></pre></td></tr></table></figure>
+
+<h4 id="写文章【新建】"><a href="#写文章【新建】" class="headerlink" title="写文章【新建】"></a>写文章【新建】</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new &quot;文章标题&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="生成静态网页"><a href="#生成静态网页" class="headerlink" title="生成静态网页"></a>生成静态网页</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo g</span><br></pre></td></tr></table></figure>
+
+<h4 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure>
+
+
+                
+            </div>
+        </article>
+    
+        <article class="post-abstract">
+            <div class="post-title">
+                <h2><a class="post-title-link" href="/2021/06/19/2021年的一些想法/">2021年的一些想法</a></h2>
+            </div>
+            <div class="post-meta">
+                <span class="post-time">2021-06-19</span>
+                
+                <span class="post-category">
+                    
+                    <a class="category" href="/categories/that-u/">that_u</a>
+                    
+                </span>
+                
+            </div>
+            <div class="post-content">
+                
+                    <p>今天看日历的时候 发现已经是六月末了 2021年也已经过了一大半<br>日子还是恍恍惚惚 除了上班 就是加班 自己的时间剩余的很少<br>也没有学习的欲望<br>虽然一直都不喜欢这样的自己 但一直在默默接受这种状态</p>
+<p>3月份的时候公司问题<br>需要换新的工作</p>
+<p>然后就是面试面试…<br>过程中也发现了自己的知识储备都是在工作中积累</p>
+<p>2021 又是一年<br>总要有一些成果</p>
+<p>换了工作 换了环境 就算新的开始吧<br>目标 计划 清单<br>持续中…</p>
+
+                
+            </div>
+        </article>
+    
+        <article class="post-abstract">
+            <div class="post-title">
                 <h2><a class="post-title-link" href="/2019/09/22/忙碌/">漫长的一生</a></h2>
             </div>
             <div class="post-meta">
@@ -91,8 +200,6 @@
             <div class="post-content">
                 
                     <p>忙 碌。</p>
-<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width="330" height="86" src="//music.163.com/outchain/player?type=2&id=1297742167&auto=1&height=66"></iframe>
-
 <p><img src="https://thatu-1259403953.cos.ap-beijing.myqcloud.com/mac.jpeg" alt></p>
 
                 
@@ -106,33 +213,16 @@
             <div class="post-meta">
                 <span class="post-time">2019-07-09</span>
                 
-            </div>
-            <div class="post-content">
-                
-                    <p>不好的 状态</p>
-
-                
-            </div>
-        </article>
-    
-        <article class="post-abstract">
-            <div class="post-title">
-                <h2><a class="post-title-link" href="/2019/06/29/执念/">执念</a></h2>
-            </div>
-            <div class="post-meta">
-                <span class="post-time">2019-06-29</span>
-                
                 <span class="post-category">
                     
-                    <a class="category" href="/categories/that-u-❤-纪念大路饼藏/">that_u ❤ 纪念大路饼藏</a>
+                    <a class="category" href="/categories/that-u/">that_u</a>
                     
                 </span>
                 
             </div>
             <div class="post-content">
                 
-                    <p>真正决定放弃的那一晚 外面下了 很大的雨 雷声轰轰的响<br>但是我却睡的很安稳 没有整夜的失眠 没有半梦半醒等你回的消息<br>两年时间 也算很久了<br>就这样 平静的告别吧</p>
-<p><img src="https://thatu-1259403953.cos.ap-beijing.myqcloud.com/inages/07faQ%2BaMQQWH8L4CdoPy%2Bg_thumb_b.jpg" alt></p>
+                    <p>不好的 状态</p>
 
                 
             </div>
@@ -200,7 +290,7 @@
             </div>
             <div class="post-content">
                 
-                    <p>一部丧电影。</p>
+                    <p>在安静的下午 看了海边的曼彻斯特<br>一部丧电影。</p>
 <p>上海最东的海边 总觉得迎面吹来的风是来自太平洋<br><img src="https://thatu-1259403953.cos.ap-beijing.myqcloud.com/north.jpeg" alt></p>
 
                 
@@ -209,14 +299,14 @@
     
         <article class="post-abstract">
             <div class="post-title">
-                <h2><a class="post-title-link" href="/2019/06/08/arrray/">我爱学习 学习使我快乐</a></h2>
+                <h2><a class="post-title-link" href="/2019/06/08/arrray/">js 数组方法</a></h2>
             </div>
             <div class="post-meta">
                 <span class="post-time">2019-06-08</span>
                 
                 <span class="post-category">
                     
-                    <a class="category" href="/categories/你好-❤-世界/">你好 ❤ 世界</a>
+                    <a class="category" href="/categories/我的打工日记/">我的打工日记</a>
                     
                 </span>
                 
@@ -226,7 +316,7 @@
                     <p><img src="https://thatu-1259403953.cos.ap-beijing.myqcloud.com/inages/xx.jpeg" alt></p>
 <!-- ![](https://thatu-1259403953.cos.ap-beijing.myqcloud.com/inages/xxx.jpg) -->
 <h3 id="js数组常用方法"><a href="#js数组常用方法" class="headerlink" title="js数组常用方法"></a>js数组常用方法</h3><blockquote>
-<p>整理学习 </p>
+<p>整理学习</p>
 </blockquote>
 <h4 id="检测数组和数组转变"><a href="#检测数组和数组转变" class="headerlink" title="检测数组和数组转变"></a>检测数组和数组转变</h4><ul>
 <li><p>instanceof</p>
@@ -303,32 +393,28 @@ for (var i = 0; i < obj.length; i++) {
 
 </li>
 </ul>
-<h4 id="数组元素的操作"><a href="#数组元素的操作" class="headerlink" title="数组元素的操作"></a>数组元素的操作</h4><ul>
-<li>concat( )<blockquote>
-</blockquote>
-</li>
-<li>slice()<blockquote>
-</blockquote>
-</li>
-<li>splice()<blockquote>
-</blockquote>
-</li>
-<li>indexOf() / lastIndexOf()<blockquote>
-</blockquote>
-</li>
-</ul>
-<h4 id="数组迭代-遍历"><a href="#数组迭代-遍历" class="headerlink" title="数组迭代(遍历)"></a>数组迭代(遍历)</h4><h4 id="1-Array-map"><a href="#1-Array-map" class="headerlink" title="1.Array.map()"></a>1.Array.map()</h4><blockquote>
-<p>此方法是将数组中的每个元素调用一个提供的函数，结果作为一个新的数组返回，并没有改变原来的数组</p>
-</blockquote>
-<h4 id="2-Array-forEach"><a href="#2-Array-forEach" class="headerlink" title="2.Array.forEach()"></a>2.Array.forEach()</h4><blockquote>
-<p>此方法是将数组中的每个元素执行传进提供的函数，没有返回值，直接改变原数组，注意和map方法区分</p>
-</blockquote>
-<h4 id="3-Array-filter"><a href="#3-Array-filter" class="headerlink" title="3.Array.filter()"></a>3.Array.filter()</h4><blockquote>
-</blockquote>
-<h4 id="4-Array-every"><a href="#4-Array-every" class="headerlink" title="4.Array.every()"></a>4.Array.every()</h4><blockquote>
-</blockquote>
-<h4 id="5-Array-some"><a href="#5-Array-some" class="headerlink" title="5.Array.some()"></a>5.Array.some()</h4><blockquote>
-</blockquote>
+<!-- #### 数组元素的操作
+- concat( )
+>
+- slice()
+>
+- splice()
+>
+- indexOf() / lastIndexOf()
+> -->
+
+<!-- #### 数组迭代(遍历)
+#### 1.Array.map()
+>此方法是将数组中的每个元素调用一个提供的函数，结果作为一个新的数组返回，并没有改变原来的数组
+
+#### 2.Array.forEach()
+>此方法是将数组中的每个元素执行传进提供的函数，没有返回值，直接改变原数组，注意和map方法区分
+#### 3.Array.filter()
+>
+#### 4.Array.every()
+>
+#### 5.Array.some()
+> -->
 
                 
             </div>
@@ -336,22 +422,21 @@ for (var i = 0; i < obj.length; i++) {
     
         <article class="post-abstract">
             <div class="post-title">
-                <h2><a class="post-title-link" href="/2018/09/14/hello-world/">Hello World</a></h2>
+                <h2><a class="post-title-link" href="/2018/09/14/hello-world/">Hello ❤ World</a></h2>
             </div>
             <div class="post-meta">
                 <span class="post-time">2018-09-14</span>
                 
                 <span class="post-category">
                     
-                    <a class="category" href="/categories/你好-❤-世界/">你好 ❤ 世界</a>
+                    <a class="category" href="/categories/我的打工日记/">我的打工日记</a>
                     
                 </span>
                 
             </div>
             <div class="post-content">
                 
-                    <p>  不知道为什么所有的语言 第一句都是 Hello world<br>  不过第一次在屏幕上输出 hello world 的时候觉得代码很神奇</p>
-<p>  <img src="https://thatu-1259403953.cos.ap-beijing.myqcloud.com/inages/hello%20.jpg" alt="hello world"></p>
+                    <p>  <img src="https://thatu-1259403953.cos.ap-beijing.myqcloud.com/inages/hello%20.jpg" alt="hello world"></p>
 
                 
             </div>
@@ -369,9 +454,17 @@ for (var i = 0; i < obj.length; i++) {
 </div>
 <footer class="footer-social">
     
+    <a class="social-link" target="_blank" href="https://github.com/thatu">
+        <i class="iconfont icon-github"></i>
+    </a>
+    
 
     
 
+    
+    <a class="social-link" target="_blank" href="http://weibo.com/thatu">
+        <i class="iconfont icon-weibo"></i>
+    </a>
     
 
     <div class="footer-copyright">
@@ -379,7 +472,7 @@ for (var i = 0; i < obj.length; i++) {
             &copy;
             
             
-            2019
+            2021
             &nbsp;<i class="iconfont icon-heart"></i>&nbsp;
             <a target="_blank" href="https://github.com/iJinxin">不牵手</a>
         </p>
